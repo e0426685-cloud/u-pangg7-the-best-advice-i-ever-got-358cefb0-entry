@@ -5,6 +5,7 @@ Standard library only.
 """
 
 import os
+import sys
 
 TEXT = (
     "My dad told me never to make a big decision when you're tired, "
@@ -13,13 +14,15 @@ TEXT = (
 )
 
 OUTPUT_PATH = "/output/entry.txt"
+MIN_CHARS = 1
+MAX_CHARS = 200
 
 
 def validate(text):
     """Check the entry is one sentence of 1-200 chars on a single line."""
     if not isinstance(text, str):
         raise TypeError("entry must be a string")
-    if not 1 <= len(text) <= 200:
+    if not MIN_CHARS <= len(text) <= MAX_CHARS:
         raise ValueError("entry must be 1-200 characters")
     if "\n" in text or "\r" in text:
         raise ValueError("entry must be a single line")
@@ -36,7 +39,14 @@ def main():
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write(TEXT)
     os.chmod(OUTPUT_PATH, 0o644)
+    with open(OUTPUT_PATH, "r", encoding="utf-8") as f:
+        written = f.read()
+    if written != TEXT:
+        raise ValueError("written entry does not match the validated text")
+    validate(written)
+    print(f"wrote {len(written)} chars to {OUTPUT_PATH}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
